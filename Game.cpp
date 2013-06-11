@@ -9,7 +9,11 @@ void Game::Start()
 {
     if ( _gameState != Unititialized )
         return;
-    _mainWindow.create( sf::VideoMode( 1024, 768, 32 ), "Pang!" );
+    _mainWindow.create( sf::VideoMode( 800, 600, 32 ), "Pang!" );
+
+	_player1.Load( "images/paddle.png" );
+	_player1.SetPosition( (800 / 2 ) - 25, 575 );
+
     _gameState = Game::ShowingSplash;
 
     while ( !Game::isExiting() )
@@ -43,7 +47,8 @@ void Game::GameLoop()
 			break;
         case Game::Playing:
             {
-                _mainWindow.clear( sf::Color( 255, 0, 0 ) );
+                _mainWindow.clear( sf::Color( 0, 0, 0 ) );
+				_player1.Draw( _mainWindow );
                 _mainWindow.display();
 
                 if ( currentEvent.type == sf::Event::Closed )
@@ -84,7 +89,6 @@ void Game::ShowMenu()
 }
 
 Game::GameState Game::_gameState = Unititialized;
-//Game::GameState Game::Unititialized;
 sf::RenderWindow Game::_mainWindow;
-
+PlayerPaddle Game::_player1;
 
