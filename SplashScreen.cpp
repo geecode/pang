@@ -1,34 +1,31 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "SplashScreen.h"
 
-void SplashScreen::Show( sf::RenderWindow &window )
+
+void SplashScreen::Show(sf::RenderWindow & renderWindow)
 {
-	sf::Texture texture;
-	
-	if ( texture.loadFromFile( "images/SplashScreen.png" ) != true )
-		return;
-
-	sf::Sprite sprite;
-	sprite.setTexture( texture );
-
-	window.draw( sprite );
-	window.display();
-
-	sf::Event lEvent;
-	while( true )
+	sf::Texture image;
+	if(image.loadFromFile("images/SplashScreen.png") != true)
 	{
-		while( window.pollEvent( lEvent ) )
+		return;
+	}
+
+	sf::Sprite sprite(image);
+	
+	renderWindow.draw(sprite);
+	renderWindow.display();
+
+	sf::Event event;
+	while(true)
+	{
+		while(renderWindow.pollEvent(event))
 		{
-			if ( lEvent.type == sf::Event::EventType::KeyPressed
-				|| lEvent.type == sf::Event::EventType::MouseButtonPressed
-				|| lEvent.type == sf::Event::EventType::Closed )
+			if(event.type == sf::Event::EventType::KeyPressed 
+				|| event.type == sf::Event::EventType::MouseButtonPressed
+				|| event.type == sf::Event::EventType::Closed )
+			{
 				return;
+			}
 		}
 	}
 }
-
-
-
-	
-
-

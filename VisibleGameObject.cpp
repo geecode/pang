@@ -1,18 +1,21 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "VisibleGameObject.h"
 
+
 VisibleGameObject::VisibleGameObject()
+	: _isLoaded(false)
 {
-	_isLoaded = false;
+	//_isLoaded = false; Slightly faster to use the above constructor initialization.
 }
+
 
 VisibleGameObject::~VisibleGameObject()
 {
 }
 
-void VisibleGameObject::Load( std::string filename )
+void VisibleGameObject::Load(std::string filename)
 {
-	if ( !_texture.loadFromFile( filename ) )
+	if(_image.loadFromFile(filename) == false)
 	{
 		_filename = "";
 		_isLoaded = false;
@@ -20,23 +23,47 @@ void VisibleGameObject::Load( std::string filename )
 	else
 	{
 		_filename = filename;
-		_sprite.setTexture( _texture );
+		_sprite.setTexture(_image);
 		_isLoaded = true;
 	}
 }
 
-void VisibleGameObject::Draw( sf::RenderWindow &window )
+void VisibleGameObject::Draw(sf::RenderWindow & renderWindow)
 {
-	if ( _isLoaded )
+	if(_isLoaded)
 	{
-		window.draw( _sprite );
+		renderWindow.draw(_sprite);
 	}
 }
 
-void VisibleGameObject::SetPosition( float x, float y )
+void VisibleGameObject::Update(float elapsedTime)
 {
-	if ( _isLoaded )
+}
+
+void VisibleGameObject::SetPosition(float x, float y)
+{
+	if(_isLoaded)
 	{
-		_sprite.setPosition( x, y );
+		_sprite.setPosition(x,y);
 	}
+}
+
+sf::Vector2f VisibleGameObject::GetPosition() const
+{
+  if(_isLoaded)
+  {
+    return _sprite.getPosition();
+  }
+  return sf::Vector2f();
+}
+
+
+sf::Sprite& VisibleGameObject::GetSprite()
+{
+  return _sprite;
+}
+
+bool VisibleGameObject::IsLoaded() const
+{
+  return _isLoaded;
 }

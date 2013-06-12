@@ -1,94 +1,118 @@
-// member function definitions for class Game
-
 #include "stdafx.h"
 #include "Game.h"
-#include "SplashScreen.h"
 #include "MainMenu.h"
+#include "SplashScreen.h"
 
-void Game::Start()
+void Game::Start(void)
 {
-    if ( _gameState != Unititialized )
-        return;
-    _mainWindow.create( sf::VideoMode( 800, 600, 32 ), "Pang!" );
+	if(_gameState != Uninitialized)
+		return;
+	
+	_mainWindow.create(sf::VideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,32),"Pang!");
+	
+	//_mainWindow.SetFramerateLimit(60);
 
-	_player1.Load( "images/paddle.png" );
-	_player1.SetPosition( (800 / 2 ) - 25, 575 );
+	PlayerPaddle *player1 = new PlayerPaddle();
+	player1->SetPosition((SCREEN_WIDTH/2), 540);
 
-    _gameState = Game::ShowingSplash;
+	GameBall *ball = new GameBall();
+	ball->SetPosition((SCREEN_WIDTH/2),(SCREEN_HEIGHT/2)-15);
+	
+	_gameObjectManager.Add("Paddle1",player1);
+	_gameObjectManager.Add("Ball",ball);
 
-    while ( !Game::isExiting() )
-    {
-        GameLoop();
-    }
+	_gameState= Game::ShowingSplash;
 
-    _mainWindow.close();
+
+	while(!IsExiting())
+	{
+		GameLoop();
+	}
+
+	_mainWindow.close();
 }
 
-bool Game::isExiting()
+bool Game::IsExiting()
 {
-    if ( _gameState == Game::Exiting )
-        return true;
-    else
-        return false;
+	if(_gameState == Game::Exiting) 
+		return true;
+	else 
+		return false;
+}
+
+
+sf::RenderWindow& Game::GetWindow()
+{
+	return _mainWindow;
+}
+
+const sf::Event& Game::GetInput() 
+{
+	sf::Event currentEvent;
+	_mainWindow.pollEvent(currentEvent);
+	return currentEvent;
 }
 
 void Game::GameLoop()
 {
-    sf::Event currentEvent;
-	while ( _mainWindow.pollEvent( currentEvent ) )
-    {
-        switch( _gameState )
-        {
+	sf::Event currentEvent;
+	_mainWindow.pollEvent(currentEvent);
+	
+	
+	switch(_gameState)
+	{
 		case Game::ShowingMenu:
-			ShowMenu();
-			break;
+			{
+				ShowMenu();
+				break;
+			}
 		case Game::ShowingSplash:
-			ShowSplashScreen();
-			break;
-        case Game::Playing:
-            {
-                _mainWindow.clear( sf::Color( 0, 0, 0 ) );
-				_player1.Draw( _mainWindow );
-                _mainWindow.display();
+			{
+				ShowSplashScreen();
+				break;
+			}
+		case Game::Playing:
+			{
+				_mainWindow.clear(sf::Color(0,0,0));
 
-                if ( currentEvent.type == sf::Event::Closed )
-                    _gameState = Game::Exiting; 
+				_gameObjectManager.UpdateAll();
+				_gameObjectManager.DrawAll(_mainWindow);
 
-				if ( currentEvent.type == sf::Event::KeyPressed ) {
-					if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Escape ) )
-						ShowMenu();
-				}
+				_mainWindow.display();
+				if(currentEvent.type == sf::Event::Closed) _gameState = Game::Exiting;
 
-                break;
-            }
-        }
-    }
+				if(currentEvent.type == sf::Event::KeyPressed)
+					{
+						if(currentEvent.key.code == sf::Keyboard::Escape) ShowMenu();
+					}
+
+				break;
+			}
+	}
 }
 
 void Game::ShowSplashScreen()
 {
 	SplashScreen splashScreen;
-	splashScreen.Show( _mainWindow );
+	splashScreen.Show(_mainWindow);
 	_gameState = Game::ShowingMenu;
 }
 
 void Game::ShowMenu()
 {
 	MainMenu mainMenu;
-	MainMenu::MenuResult result = mainMenu.Show( _mainWindow );
-
-	switch( result )
+	MainMenu::MenuResult result = mainMenu.Show(_mainWindow);
+	switch(result)
 	{
-	case MainMenu::Exit:
-		_gameState = Game::Exiting;
-		break;
-	case MainMenu::Play:
-		_gameState = Game::Playing;
-		break;
+		case MainMenu::Exit:
+			_gameState = Exiting;
+			break;
+		case MainMenu::Play:
+			_gameState = Playing;
+			break;
 	}
 }
 
-Game::GameState Game::_gameState = Unititialized;
+Game::GameState Game::_gameState = Uninitialized;
 sf::RenderWindow Game::_mainWindow;
-PlayerPaddle Game::_player1;
-
+GameObjectManager Game::_gameObjectManager;
